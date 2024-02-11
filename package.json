@@ -1,0 +1,24 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "CLI app to view an employee database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clstevenson/Employee-Tracker.git"
+  },
+  "author": "Chris Stevenson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clstevenson/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/clstevenson/Employee-Tracker#readme",
+  "dependencies": {
+    "dotenv": "^16.4.2",
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.9.1"
+  }
+}
