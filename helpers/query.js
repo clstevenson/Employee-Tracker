@@ -198,10 +198,7 @@ ORDER BY d.\`name\`, e.last_name`;
 //               Functions to update (add/delete) employee data              //
 ///////////////////////////////////////////////////////////////////////////////
 
-/*
- * Create functions for the following updateRole(roleInfo)
- */
-
+// add a new department to the database
 const addDept = (db, deptInfo) => {
   // deptInfo is an object with a single property, "dept"
   const sql = `INSERT INTO department (name) VALUES ('${deptInfo.dept}')`;
@@ -211,8 +208,8 @@ const addDept = (db, deptInfo) => {
   });
 }
 
+// add a new role (job title) to the database
 const addRole = (db, roleInfo) => {
-  // function to add a new role to the "role" table
   // roleInfo object has three inputs: title (ie job title), salary, and dept
   const { title, salary, dept } = roleInfo;
 
@@ -229,6 +226,7 @@ const addRole = (db, roleInfo) => {
   });
 }
 
+// add a new employee to the database
 const addEmployee = (db, empInfo) => {
   // empInfo has the four properties shown below
   // note that that manager name is the full name, not first + last (or ID)
@@ -250,5 +248,23 @@ const addEmployee = (db, empInfo) => {
   })
 }
 
+// update an existing employee's job title (role)
+const updateRole = (db, roleInfo) => {
+  // update a person's role (job title), notably without changing their manager
+  // input roleInfo contains two properties: fullName and title
+  const { fullName, title } = roleInfo;
+  const [firstName, lastName] = fullName.split(' ');
+
+  const sql = `UPDATE employee
+SET
+  role_id = (SELECT id FROM \`role\` WHERE title = '${title}')
+WHERE
+  first_name = '${firstName}' AND last_name = '${lastName}'`;
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.log(`Updated ${fullName} role to ${title}`);
+  });
+}
+
 // export functions
-module.exports = { init, viewDepts, viewRoles, viewEmployees, addDept, addRole , addEmployee };
+module.exports = { init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole };

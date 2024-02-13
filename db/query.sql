@@ -68,10 +68,14 @@ INSERT INTO department (name) VALUES ('HR');
 
 -- from a department (say "Legal") list the appropriate ID (ie, a lookup)
 SELECT id from department WHERE `name` = 'Legal'; -- returned 3
-
 -- then use the result to insert a new role, say 'paralegal'
+
 INSERT INTO `role` (title, salary, department_id)
-VALUES ('Paralegal', 80000, 3);
+    VALUES('Paralegal', 80000, (
+        SELECT
+          id FROM department
+        WHERE
+          `name` = 'Legal'));
 
 -- adding an employee (prompted for first, last, role, and manager)
 -- need to do two lookups here: role -> role_ID and manager -> manager_id
@@ -79,9 +83,28 @@ VALUES ('Paralegal', 80000, 3);
 
 SELECT id FROM `role` WHERE title = "Paralegal"; -- returned 9
 SELECT employee_id from managers WHERE manager = 'Denny Zizka'; -- returned 7
--- but if the new employee is also a manager, need to change manager_id to NULL
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('Sam', 'Smith', 9, 7);
+-- if the new employee is also a manager, do I need to change manager_id to NULL?
 
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    VALUES('Sam', 'Smith', (
+        SELECT
+          id FROM `role`
+        WHERE
+          title = "Paralegal"), (
+          SELECT
+            employee_id FROM managers
+          WHERE
+            manager = 'Denny Zizka'));
 
 -- updating a role/job (prompted to select employee and their new role, both selected from lists of current options)
+-- need to do lookups: employee.id from name, role.id from role, and manager_id from the department_id (Using managers)
+SELECT id FROM (SELECT * from employee) e WHERE e.first_name = "Sashi" AND e.last_name = "Reeker"; -- returns 4
+SELECT id FROM `role` WHERE title = 'Accountant';
+
+UPDATE
+  employee
+SET
+  role_id = (SELECT id FROM `role` WHERE title = 'Paralegal')
+WHERE
+  first_name = 'Chris'
+  AND last_name = 'Stevenson';

@@ -33,6 +33,13 @@ input = {
 };
 q.addEmployee(db, input);
 
+input = {
+  fullName: 'Chris Stevenson',
+  title: 'Lead Scientist'
+};
+
+q.updateRole(db, input);
+
 db.end();
 
 // TODO: prepare Inquirer menu and figure out how I will respond to it
