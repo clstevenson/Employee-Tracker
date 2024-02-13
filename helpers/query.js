@@ -2,12 +2,6 @@
 
 const mysql = require('mysql2');
 
-/*
- * Create functions for the following
- * addEmployee(empInfo), addRole(roleInfo), addDept(deptInfo)
- * updateRole(roleInfo)
- */
-
 /* Tasks for MVP
  * - View all employees: empl ID, first, last, title, dept, salary, manager
  * - View all roles: job title, role ID, dept, salary
@@ -156,7 +150,7 @@ const viewDepts = db => {
   // View all departments: dept name and ID
   // call showTable() to display
 
-  const sql = 'select * from department';
+  const sql = 'select id as \`dept_id\`, name as \`dept\` from department';
 
   db.query(sql, (err, results) => {
     if (err) console.log(err);
@@ -167,7 +161,7 @@ const viewDepts = db => {
 const viewRoles = db => {
   // view roles/jobs: job title, id, department, and salary
   const sql = `SELECT
-  r.id \`job_id\`, r.title as \`job_title\`, d.\`name\` as \`department\`, r.salary
+  r.id \`job_id\`, r.title as \`job_title\`, d.\`name\` as \`dept\`, r.salary
 FROM \`role\` r
   JOIN department d ON r.department_id = d.id`;
 
@@ -180,11 +174,11 @@ FROM \`role\` r
 const viewEmployees = db => {
   // view employees: id, first & last names, job titles, depts, salaries, managers
   const sql = `SELECT
-  e.id,
+  e.id as \`emp_id\`,
   e.first_name,
   e.last_name,
-  r.title,
-  d. \`name\` AS \`department\`,
+  r.title as \`job_title\`,
+  d. \`name\` AS \`dept\`,
   r.salary,
   m.manager
 FROM
@@ -203,6 +197,12 @@ ORDER BY d.\`name\`, e.last_name`;
 ///////////////////////////////////////////////////////////////////////////////
 //               Functions to update (add/delete) employee data              //
 ///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Create functions for the following
+ * addEmployee(empInfo), addRole(roleInfo), addDept(deptInfo)
+ * updateRole(roleInfo)
+ */
 
 
 // export functions
