@@ -156,4 +156,18 @@ const viewDepts = db => {
   });
 }
 
-module.exports = { init, viewDepts }
+const viewRoles = db => {
+  // view roles/jobs: job title, id, department, and salary
+  const sql = `SELECT
+  r.id \`job_id\`, r.title as \`job_title\`, d.\`name\` as \`department\`, r.salary
+FROM \`role\` r
+  JOIN department d ON r.department_id = d.id`;
+
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.table(results);
+  });
+}
+
+
+module.exports = { init, viewDepts, viewRoles };

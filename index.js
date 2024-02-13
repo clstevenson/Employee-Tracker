@@ -9,6 +9,8 @@ const db = q.init(process.env.DB_database); // input eventually obtained from us
 
 q.viewDepts(db);
 
+q.viewRoles(db);
+
 db.end();
 
 // TODO: prepare Inquirer menu and figure out how I will respond to it
