@@ -13,6 +13,26 @@ q.viewRoles(db);
 
 q.viewEmployees(db);
 
+// mimic input from Inquirer
+let input = {};
+input.dept = 'HR';
+q.addDept(db, input);
+
+input = {
+  title: 'Paralegal',
+  salary: 80000,
+  dept: 'Legal'
+};
+q.addRole(db, input);
+
+input = {
+  firstName: 'Chris',
+  lastName: 'Stevenson',
+  title: 'Paralegal',
+  managerFullName: 'Denny Zizka'
+};
+q.addEmployee(db, input);
+
 db.end();
 
 // TODO: prepare Inquirer menu and figure out how I will respond to it

@@ -133,7 +133,7 @@ FROM employee e
   JOIN role r ON e.role_id = r.id
   JOIN department d ON r.department_id = d.id
 WHERE e.manager_id IS NULL`;
-    db.query(sql, err => {
+  db.query(sql, err => {
     if (err) console.log(err);
   });
 
@@ -199,11 +199,56 @@ ORDER BY d.\`name\`, e.last_name`;
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
- * Create functions for the following
- * addEmployee(empInfo), addRole(roleInfo), addDept(deptInfo)
- * updateRole(roleInfo)
+ * Create functions for the following updateRole(roleInfo)
  */
 
+const addDept = (db, deptInfo) => {
+  // deptInfo is an object with a single property, "dept"
+  const sql = `INSERT INTO department (name) VALUES ('${deptInfo.dept}')`;
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.log(`Added new department ${deptInfo.dept} to the database`);
+  });
+}
+
+const addRole = (db, roleInfo) => {
+  // function to add a new role to the "role" table
+  // roleInfo object has three inputs: title (ie job title), salary, and dept
+  const { title, salary, dept } = roleInfo;
+
+  const sql = `INSERT INTO \`role\` (title, salary, department_id)
+    VALUES('${title}', ${salary}, (
+        SELECT
+          id FROM department
+        WHERE
+          \`name\` = '${dept}'))`;
+
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.log(`Added new job ${roleInfo.title} to the database`);
+  });
+}
+
+const addEmployee = (db, empInfo) => {
+  // empInfo has the four properties shown below
+  // note that that manager name is the full name, not first + last (or ID)
+  const { firstName, lastName, title, managerFullName } = empInfo;
+
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    VALUES('${firstName}', '${lastName}', (
+        SELECT
+          id FROM \`role\`
+        WHERE
+          title = '${title}'), (
+          SELECT
+            employee_id FROM managers
+          WHERE
+            manager = '${managerFullName}'))`;
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.log(`Added new employee ${firstName + ' ' + lastName} to the database`);
+  })
+}
 
 // export functions
-module.exports = { init, viewDepts, viewRoles, viewEmployees };
+module.exports = { init, viewDepts, viewRoles, viewEmployees, addDept, addRole , addEmployee };
