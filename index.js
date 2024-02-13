@@ -1,27 +1,15 @@
 "use strict";
 
-const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const q = require('./helpers/query');
 require('dotenv').config();
 const cTable = require('console.table');
 
-// eventually this will be replaced by name provieded by user
-const dbName = process.env.DB_database;
-
-// connect to DB
-const db = mysql.createConnection({
-  host: process.env.DB_host,
-  user: process.env.DB_user,
-  password: process.env.DB_password,
-  database: dbName
-});
+const db = q.init(process.env.DB_database); // input eventually obtained from user thru Inquirer
 
 q.viewDepts(db);
 
 db.end();
-
-// TODO: create init() function to initialize the app (items 1-2 below, plus starting the DB connection)
 
 // TODO: prepare Inquirer menu and figure out how I will respond to it
 
