@@ -11,6 +11,8 @@ q.viewDepts(db);
 
 q.viewRoles(db);
 
+q.viewEmployees(db);
+
 db.end();
 
 // TODO: prepare Inquirer menu and figure out how I will respond to it

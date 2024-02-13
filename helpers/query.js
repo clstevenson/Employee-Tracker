@@ -4,7 +4,6 @@ const mysql = require('mysql2');
 
 /*
  * Create functions for the following
- * viewDepts(), viewRoles(), viewEmployees()
  * addEmployee(empInfo), addRole(roleInfo), addDept(deptInfo)
  * updateRole(roleInfo)
  */
@@ -19,13 +18,18 @@ const mysql = require('mysql2');
  * - Update employee role
 */
 
+///////////////////////////////////////////////////////////////////////////////
+//                         Function to initialize app                        //
+///////////////////////////////////////////////////////////////////////////////
+
 /**
- * Initializes the app. Takes a datababse name as input and returns a connection
- * object initiated by the mysql2 module. Use that object when calling subsequent
- * DB queries.
+ * Takes a datababse name as input and returns a connection object initiated
+ * by the mysql2 module. Use that object when calling subsequent DB queries.
  *
- * Also creates the necessary schema and seeds them.
+ * Also creates the necessary schema and seeds them, including a table view
+ * of manager data.
  */
+
 const init = dbName => {
   const db = mysql.createConnection({
     host: process.env.DB_host,
@@ -144,6 +148,10 @@ WHERE e.manager_id IS NULL`;
   return db;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+//                      Functions to view employee data                      //
+///////////////////////////////////////////////////////////////////////////////
+
 const viewDepts = db => {
   // View all departments: dept name and ID
   // call showTable() to display
@@ -154,7 +162,7 @@ const viewDepts = db => {
     if (err) console.log(err);
     else console.table(results);
   });
-}
+};
 
 const viewRoles = db => {
   // view roles/jobs: job title, id, department, and salary
@@ -167,7 +175,35 @@ FROM \`role\` r
     if (err) console.log(err);
     console.table(results);
   });
-}
+};
+
+const viewEmployees = db => {
+  // view employees: id, first & last names, job titles, depts, salaries, managers
+  const sql = `SELECT
+  e.id,
+  e.first_name,
+  e.last_name,
+  r.title,
+  d. \`name\` AS \`department\`,
+  r.salary,
+  m.manager
+FROM
+  employee e
+  JOIN \`role\` r ON e.role_id = r.id
+  JOIN department d ON r.department_id = d.id
+  LEFT JOIN managers m on e.manager_id = m.employee_id
+ORDER BY d.\`name\`, e.last_name`;
+
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    console.table(results);
+  });
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//               Functions to update (add/delete) employee data              //
+///////////////////////////////////////////////////////////////////////////////
 
 
-module.exports = { init, viewDepts, viewRoles };
+// export functions
+module.exports = { init, viewDepts, viewRoles, viewEmployees };
