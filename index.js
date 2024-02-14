@@ -11,7 +11,7 @@ const cTable = require('console.table');
 ///////////////////////////////////////////////////////////////////////////////
 
 const main = async () => {
-  let answer, isFinished = false;  // user responses
+  let answer, input, isFinished = false;  // user responses
   const options = [ // CRUD options for user
     "View All Employees",
     "Add Employee",
@@ -84,8 +84,10 @@ const main = async () => {
           await q.viewDepts(db);
           break;
         case "Add Department":
-          // need to get more info from user
-          await q.addDept(db);
+          input = await inquirer.prompt([
+            { name: "dept", type: "input", message: "Name of new department?" }
+          ]);
+          await q.addDept(db, input);
           break;
       }
     }
