@@ -24,18 +24,22 @@ SELECT
 FROM
   department;
 
--- create virtual table of depts with managers for convenience
-CREATE or REPLACE VIEW managers AS
+USE challenge12;
+
+CREATE OR REPLACE VIEW managers AS
 SELECT
   r.title,
-  e.id as employee_id,
-  CONCAT(e.first_name, ' ', e.last_name) AS manager,
-  d.id as `department_id`,
-  d.`name` as `department_name`
-FROM employee e
-  JOIN role r ON e.role_id = r.id
+  e.id AS employee_id,
+  CONCAT(
+    e.first_name, ' ', e.last_name) AS manager,
+  d.id AS `department_id`,
+  d. `name` AS `department_name`
+FROM
+  employee e
+  JOIN ROLE r ON e.role_id = r.id
   JOIN department d ON r.department_id = d.id
-WHERE e.manager_id IS NULL;
+WHERE
+  e.manager_id IS NULL;
 
 -- view all roles: ID, title, dept, salary, and dept manager
 -- note that the video did not show the manager. Should it be the position? Or the person?
