@@ -70,8 +70,23 @@ const main = async () => {
           await q.addEmployee(db);
           break;
         case "Update Employee Role":
-          // need to get more info from user
-          await q.updateRole(db);
+          // get a list of all employees as an array
+          const employeeList = await q.getEmployeeList(db);
+          // get a list of all possible (new) roles as an array
+          const roleList = await q.getRoleList(db);
+          // need to get the following info: fullName, title
+          const { name } = await inquirer.prompt([
+            { name: "name", type: "list",
+              message: "Select an employee whose role you wish to update.",
+              choices: employeeList }
+          ]);
+          const { role } = await inquirer.prompt([
+            { name: "role", type: "list",
+              message: "Select the new role for the employee",
+              choices: roleList }
+          ]);
+          // update the role in the DB
+          await q.updateRole(db, { name, role });
           break;
         case "View All Roles":
           await q.viewRoles(db);
@@ -87,7 +102,9 @@ const main = async () => {
             { name: "salary", type: "number", message: "What is the salary of the role?" }
           ]);
           const { dept } = await inquirer.prompt([
-            { name: "dept", type: "list", message: "Which department does the role below to?", choices: deptList }
+            { name: "dept", type: "list",
+              message: "Which department does the role below to?",
+              choices: deptList }
           ]);
           // now add the role to the DB
           await q.addRole(db, { title, salary, dept });

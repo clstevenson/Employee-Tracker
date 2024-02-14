@@ -230,19 +230,19 @@ const addEmployee = async (db, empInfo) => {
 // update an existing employee's job title (role)
 const updateRole = async (db, roleInfo) => {
   // update a person's role (job title), notably without changing their manager
-  // input roleInfo contains two properties: fullName and title
-  const { fullName, title } = roleInfo;
-  const [firstName, lastName] = fullName.split(' ');
+  // input roleInfo contains two properties: full name and job title (ie, role)
+  const { name, role } = roleInfo;
+  const [firstName, lastName] = name.split(' ');
 
   try {
     const sql = `UPDATE employee
 SET
-  role_id = (SELECT id FROM \`role\` WHERE title = '${title}')
+  role_id = (SELECT id FROM \`role\` WHERE title = '${role}')
 WHERE
   first_name = '${firstName}' AND last_name = '${lastName}'`;
 
     await db.query(sql);
-    console.log(`Updated ${fullName} role to ${title}`);
+    console.log(`Updated ${name} role to ${role}`);
   } catch (err) {
     console.log(err);
   }
@@ -275,6 +275,27 @@ const getDeptList = async db => {
   }
 }
 
+// returns an array of current employees
+const getEmployeeList = async db => {
+  const sql = 'SELECT CONCAT(first_name, " ", last_name) as `name` FROM employee ORDER BY last_name';
+  try {
+    const [results, fields] = await db.query(sql);
+    return results.map(item => item.name);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// returns an array of current roles
+const getRoleList = async db => {
+  const sql = 'SELECT title FROM role ORDER BY title';
+  try {
+    const [results, fields] = await db.query(sql);
+    return results.map(item => item.title);
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 // export functions
-module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole, getDeptList };
+module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole, getDeptList, getEmployeeList, getRoleList };
