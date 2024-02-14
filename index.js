@@ -12,6 +12,7 @@ const cTable = require('console.table');
 
 const main = async () => {
   let answer, input, isFinished = false;  // user responses
+  let deptList=[], roleList=[], employeeList=[]; // current lists from DB
   const options = [ // CRUD options for user
     "View All Employees",
     "Add Employee",
@@ -66,14 +67,34 @@ const main = async () => {
           await q.viewEmployees(db);
           break;
         case "Add Employee":
-          // need to get more info from user
-          await q.addEmployee(db);
+          // get the current list of employees and roles
+          employeeList = await q.getEmployeeList(db);
+          roleList = await q.getRoleList(db);
+          // collect info from user
+          const { firstName } = await inquirer.prompt([
+            { name: "firstName", type: "input", message: "What is the employee's first name?" }
+          ]);
+          const { lastName } = await inquirer.prompt([
+            { name: "lastName", type: "input", message: "What is the employee's last name?" }
+          ]);
+          const { employeeRole } = await inquirer.prompt([
+            { name: "employeeRole", type: "list",
+              message: "What is the employee's role?",
+              choices: roleList}
+          ]);
+          const { managerFullName } = await inquirer.prompt([
+            { name: "managerFullName", type: "list",
+              message: "Who is the employee's manager?",
+              choices: employeeList}
+          ]);
+          // add the employee to the list
+          await q.addEmployee(db, { firstName, lastName, title: employeeRole, managerFullName });
           break;
         case "Update Employee Role":
           // get a list of all employees as an array
-          const employeeList = await q.getEmployeeList(db);
+          employeeList = await q.getEmployeeList(db);
           // get a list of all possible (new) roles as an array
-          const roleList = await q.getRoleList(db);
+          roleList = await q.getRoleList(db);
           // need to get the following info: fullName, title
           const { name } = await inquirer.prompt([
             { name: "name", type: "list",
@@ -93,7 +114,7 @@ const main = async () => {
           break;
         case "Add Role":
           // retrieve list of department as array
-          const deptList = await q.getDeptList(db);
+          deptList = await q.getDeptList(db);
           // from user need title, salary, dept (properties of input object)
           const { title } = await inquirer.prompt([
             { name: "title", type: "input", message: "What is the name of the role?" }
