@@ -24,37 +24,36 @@
  */
 
 // check to see if the database exists (not used at present)
-const dbExists = (db, dbName) => {
+const dbExists = async (db, dbName) => {
   const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+  try {
+    const results = db.query(sql);
     if (results[0].SCHEMA_NAME === undefined) return false;
     else return true;
-  });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-const init = db => {
+const init = async db => {
   let sql = ``;  // queries to pass to MySQL
 
   // delete the tables if they exists, needs to be in reverse order due
   // to FK constraints
-  db.query('DROP TABLE IF EXISTS employee', (err, results) => {
-    if (err) console.log(err);
-  });
-  db.query('DROP TABLE IF EXISTS role', (err, results) => {
-    if (err) console.log(err);
-  });
-  db.query('DROP TABLE IF EXISTS department', (err, results) => {
-    if (err) console.log(err);
-  });
+  try {
+    await db.query('DROP TABLE IF EXISTS employee');
+    await db.query('DROP TABLE IF EXISTS role');
+    await db.query('DROP TABLE IF EXISTS department');
+  } catch (err) {
+    console.log(err);
+  }
 
   //create the three tables
-  sql = 'CREATE TABLE IF NOT EXISTS department(id INT NOT NULL AUTO_INCREMENT,name VARCHAR(30)NOT NULL,CONSTRAINT department_pk PRIMARY KEY(id))'
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+  try {
+    sql = 'CREATE TABLE IF NOT EXISTS department(id INT NOT NULL AUTO_INCREMENT,name VARCHAR(30)NOT NULL,CONSTRAINT department_pk PRIMARY KEY(id))'
+  await db.query(sql);
 
-  sql = `CREATE TABLE role (
+    sql = `CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) DEFAULT NULL,
   salary DECIMAL DEFAULT 0,
@@ -64,11 +63,9 @@ const init = db => {
   CONSTRAINT role_fk_department
     FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE SET NULL
 )`;
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+    await db.query(sql);
 
-  sql = `CREATE TABLE IF NOT EXISTS employee (
+    sql = `CREATE TABLE IF NOT EXISTS employee (
   id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(30) DEFAULT NULL,
   last_name VARCHAR(30) DEFAULT NULL,
@@ -80,17 +77,18 @@ const init = db => {
   CONSTRAINT employee_fk_employee
     FOREIGN KEY (manager_id) REFERENCES employee (id) ON DELETE SET NULL
 )`;
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+    await db.query(sql);
+
+  } catch (err) {
+    console.log(err);
+  }
 
   // now to seed the tables
-  sql = 'INSERT INTO department(name) VALUES("Research"),("Finance"),("Legal"),("Sales")';
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+  try {
+    sql = 'INSERT INTO department(name) VALUES("Research"),("Finance"),("Legal"),("Sales")';
+    await db.query(sql);
 
-  sql = `INSERT INTO role (title, salary, department_id) VALUES
+    sql = `INSERT INTO role (title, salary, department_id) VALUES
   ("Lead Scientist", 150000, 1),
   ("Lab Technician", 80000, 1),
   ("Account Manager", 160000, 2),
@@ -99,11 +97,9 @@ const init = db => {
   ("Lawyer", 190000, 3),
   ("Sales Lead", 100000, 4),
   ("Salesperson", 80000, 4)`;
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+    await db.query(sql);
 
-  sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
+    sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
 ('Giap', 'Capobianchi', 1, NULL),
 ('Xiaobin', 'Geffroy', 2, 1),
 ('Sungwon', 'Ratnaker', 2, 1),
@@ -118,12 +114,14 @@ const init = db => {
 ('Jianwen', 'Kemmerer', 8, 10),
 ('Gro', 'Vendrig', 2, 1),
 ('Insup', 'Syang', 8, 10)`;
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+    await db.query(sql);
+  } catch (err) {
+    console.log(err);
+  }
 
   // the following table view ("virtual table") will be useful in future queries
-  sql = `CREATE or REPLACE VIEW managers AS
+  try {
+    sql = `CREATE or REPLACE VIEW managers AS
 SELECT
   r.title,
   e.id as employee_id,
@@ -134,12 +132,12 @@ FROM employee e
   JOIN role r ON e.role_id = r.id
   JOIN department d ON r.department_id = d.id
 WHERE e.manager_id IS NULL`;
-  db.query(sql, err => {
-    if (err) console.log(err);
-  });
+    await db.query(sql);
+  } catch (err) {
+    console.log(err);
+  }
 
   console.log('Database and tables initialized and seeded.');
-
   return db;
 };
 
@@ -147,34 +145,37 @@ WHERE e.manager_id IS NULL`;
 //                      Functions to view employee data                      //
 ///////////////////////////////////////////////////////////////////////////////
 
-const viewDepts = db => {
+const viewDepts = async db => {
   // View all departments: dept name and ID
-  // call showTable() to display
 
-  const sql = 'select id as \`dept_id\`, name as \`dept\` from department';
-
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
-    else console.table(results);
-  });
+  try {
+    const sql = 'select id as \`dept_id\`, name as \`dept\` from department';
+    const results = await db.query(sql);
+    console.table(results);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const viewRoles = db => {
+const viewRoles = async db => {
   // view roles/jobs: job title, id, department, and salary
-  const sql = `SELECT
+  try {
+    const sql = `SELECT
   r.id \`job_id\`, r.title as \`job_title\`, d.\`name\` as \`dept\`, r.salary
 FROM \`role\` r
   JOIN department d ON r.department_id = d.id`;
 
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+    const results = await db.query(sql);
     console.table(results);
-  });
-};
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-const viewEmployees = db => {
+const viewEmployees = async db => {
   // view employees: id, first & last names, job titles, depts, salaries, managers
-  const sql = `SELECT
+  try {
+    const sql = `SELECT
   e.id as \`emp_id\`,
   e.first_name,
   e.last_name,
@@ -189,10 +190,11 @@ FROM
   LEFT JOIN managers m on e.manager_id = m.employee_id
 ORDER BY d.\`name\`, e.last_name`;
 
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+    const results = await db.query(sql);
     console.table(results);
-  });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,40 +202,45 @@ ORDER BY d.\`name\`, e.last_name`;
 ///////////////////////////////////////////////////////////////////////////////
 
 // add a new department to the database
-const addDept = (db, deptInfo) => {
+const addDept = async (db, deptInfo) => {
   // deptInfo is an object with a single property, "dept"
-  const sql = `INSERT INTO department (name) VALUES ('${deptInfo.dept}')`;
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+  try {
+    const sql = `INSERT INTO department (name) VALUES ('${deptInfo.dept}')`;
+    await db.query(sql);
     console.log(`Added new department ${deptInfo.dept} to the database`);
-  });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // add a new role (job title) to the database
-const addRole = (db, roleInfo) => {
+const addRole = async (db, roleInfo) => {
   // roleInfo object has three inputs: title (ie job title), salary, and dept
   const { title, salary, dept } = roleInfo;
 
-  const sql = `INSERT INTO \`role\` (title, salary, department_id)
+  try {
+    const sql = `INSERT INTO \`role\` (title, salary, department_id)
     VALUES('${title}', ${salary}, (
         SELECT
           id FROM department
         WHERE
           \`name\` = '${dept}'))`;
 
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+    await db.query(sql);
     console.log(`Added new job ${roleInfo.title} to the database`);
-  });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // add a new employee to the database
-const addEmployee = (db, empInfo) => {
+const addEmployee = async (db, empInfo) => {
   // empInfo has the four properties shown below
   // note that that manager name is the full name, not first + last (or ID)
   const { firstName, lastName, title, managerFullName } = empInfo;
 
-  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+  try {
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES('${firstName}', '${lastName}', (
         SELECT
           id FROM \`role\`
@@ -243,28 +250,32 @@ const addEmployee = (db, empInfo) => {
             employee_id FROM managers
           WHERE
             manager = '${managerFullName}'))`;
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+    await db.query(sql);
     console.log(`Added new employee ${firstName + ' ' + lastName} to the database`);
-  })
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // update an existing employee's job title (role)
-const updateRole = (db, roleInfo) => {
+const updateRole = async (db, roleInfo) => {
   // update a person's role (job title), notably without changing their manager
   // input roleInfo contains two properties: fullName and title
   const { fullName, title } = roleInfo;
   const [firstName, lastName] = fullName.split(' ');
 
-  const sql = `UPDATE employee
+  try {
+    const sql = `UPDATE employee
 SET
   role_id = (SELECT id FROM \`role\` WHERE title = '${title}')
 WHERE
   first_name = '${firstName}' AND last_name = '${lastName}'`;
-  db.query(sql, (err, results) => {
-    if (err) console.log(err);
+
+    await db.query(sql);
     console.log(`Updated ${fullName} role to ${title}`);
-  });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // export functions

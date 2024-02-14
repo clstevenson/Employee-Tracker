@@ -1,7 +1,7 @@
 "use strict";
 
 const inquirer = require('inquirer');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const q = require('./helpers/query');
 require('dotenv').config();
 const cTable = require('console.table');
@@ -10,35 +10,6 @@ const cTable = require('console.table');
 //                            Function Definitions                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-// get database name and create it if necessary (or confirm overwrite)
-const initialize = async () => {
-  let dbName;
-
-  try {
-    const { dbName } = await inquirer.prompt([{
-      type: 'input', name: 'dbName', message: "Choose a database (if it exists it will be overwritten!)"
-    }]);
-
-    // TODO use q.dbExists to check if it already exists and then confirm with user
-
-  } catch (err) {
-    console.log(err);
-  }
-
-  // create database and "load" it
-  db.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`, err => {
-    if (err) console.log(err);
-  });
-  db.query(`USE ${dbName}`, err => {
-    if (err) console.log(err);
-  });
-
-  // initialize and seed tables
-  // eventually can use dbExists() function to determine if that is necessary
-  q.init(db);
-}
-
-// prompt user for database CRUD operations
 const main = async () => {
   let answer, isFinished = false;  // user responses
   const options = [ // CRUD options for user
@@ -52,6 +23,34 @@ const main = async () => {
     "Quit"
   ];
 
+  // connect with MySQL system
+  const db = await mysql.createConnection({
+    host: process.env.DB_host,
+    user: process.env.DB_user,
+    password: process.env.DB_password
+  });
+
+  // get database name from user and create it and the tables
+  try {
+    const { dbName } = await inquirer.prompt([{
+      type: 'input', name: 'dbName', message: "Choose a database (if it exists it will be overwritten!)"
+    }]);
+
+    // TODO use q.dbExists to check if it already exists and then confirm with user
+
+
+    // create database and "load" it
+    await db.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+    await db.query(`USE ${dbName}`);
+
+    // initialize and seed tables
+    // eventually can use dbExists() function to determine if that is necessary
+    await q.init(db);
+  } catch (err) {
+    console.log(err);
+  }
+
+  // prompt user for CRUD operations (or allow to quit)
   while (!isFinished) {
     // prompt user for DB actions
     const answer = await inquirer.prompt([
@@ -66,26 +65,12 @@ const main = async () => {
     }
   }
 
-  db.end();  // maybe move this elsewhere once I promisify mysql2?
+  // close MySQL connection
+  db.end();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//                           Executible Statements                           //
-///////////////////////////////////////////////////////////////////////////////
-
-// establish connection to MySQL
-const db = mysql.createConnection({
-  host: process.env.DB_host,
-  user: process.env.DB_user,
-  password: process.env.DB_password
-});
-
-// initialize();
-
+// start the app
 main();
-
-// TODO need to switch mysql2 to promisified version before ending with the line below
-// db.end();
 
 /**
 
