@@ -10,11 +10,19 @@ Tasks for which queries must be written
 7. Add department
 
 Snippets below are used for these tasks
-*/
+ */
+
+CREATE TABLE test (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(30) NOT NULL);
 
 /************ table views *******************/
 -- view all department: ID, name
-SELECT * FROM department;
+
+SELECT
+  *
+FROM
+  department;
 
 -- create virtual table of depts with managers for convenience
 CREATE or REPLACE VIEW managers AS
@@ -106,5 +114,4 @@ UPDATE
 SET
   role_id = (SELECT id FROM `role` WHERE title = 'Paralegal')
 WHERE
-  first_name = 'Chris'
-  AND last_name = 'Stevenson';
+  first_name = 'Chris' AND last_name = 'Stevenson';

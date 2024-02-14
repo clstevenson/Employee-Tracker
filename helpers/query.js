@@ -13,16 +13,12 @@ const init = async db => {
   try {
     await db.query('DROP TABLE IF EXISTS employee');
     await db.query('DROP TABLE IF EXISTS role');
-    await db.query('DROP TABLE IF EXISTS department');
   } catch (err) {
     console.log(err);
   }
 
   //create the three tables
   try {
-    sql = 'CREATE TABLE IF NOT EXISTS department(id INT NOT NULL AUTO_INCREMENT,name VARCHAR(30)NOT NULL,CONSTRAINT department_pk PRIMARY KEY(id))'
-  await db.query(sql);
-
     sql = `CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) DEFAULT NULL,
@@ -55,9 +51,6 @@ const init = async db => {
 
   // now to seed the tables
   try {
-    sql = 'INSERT INTO department(name) VALUES("Research"),("Finance"),("Legal"),("Sales")';
-    await db.query(sql);
-
     sql = `INSERT INTO role (title, salary, department_id) VALUES
   ("Lead Scientist", 150000, 1),
   ("Lab Technician", 80000, 1),
@@ -115,18 +108,6 @@ WHERE e.manager_id IS NULL`;
 //                      Functions to view employee data                      //
 ///////////////////////////////////////////////////////////////////////////////
 
-const viewDepts = async db => {
-  // View all departments: dept name and ID
-
-  try {
-    const sql = 'select id as \`dept_id\`, name as \`dept\` from department';
-    const results = await db.query(sql);
-    console.table(results[0]);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const viewRoles = async db => {
   // view roles/jobs: job title, id, department, and salary
   try {
@@ -171,17 +152,6 @@ ORDER BY d.\`name\`, e.last_name`;
 //               Functions to update (add/delete) employee data              //
 ///////////////////////////////////////////////////////////////////////////////
 
-// add a new department to the database
-const addDept = async (db, deptInfo) => {
-  // deptInfo is an object with a single property, "dept"
-  try {
-    const sql = `INSERT INTO department (name) VALUES ('${deptInfo.dept}')`;
-    await db.query(sql);
-    console.log(`Added new department ${deptInfo.dept} to the database`);
-  } catch (err) {
-    console.log(err);
-  }
-}
 
 // add a new role (job title) to the database
 const addRole = async (db, roleInfo) => {
@@ -264,17 +234,6 @@ const dbExists = async (db, dbName) => {
   }
 }
 
-// returns an array of current departments
-const getDeptList = async db => {
-  const sql = 'SELECT name FROM department';
-  try {
-    const [results, fields]  = await db.query(sql);
-    return results.map(item => item.name);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 // returns an array of current employees
 const getEmployeeList = async db => {
   const sql = 'SELECT CONCAT(first_name, " ", last_name) as `name` FROM employee ORDER BY last_name';
@@ -298,4 +257,4 @@ const getRoleList = async db => {
 }
 
 // export functions
-module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole, getDeptList, getEmployeeList, getRoleList };
+module.exports = { init, viewRoles, viewEmployees, addRole, addEmployee, updateRole, getEmployeeList, getRoleList };

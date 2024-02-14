@@ -3,6 +3,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2/promise');
 const q = require('./helpers/query');
+const { DepartmentTbl, RoleTbl, EmployeeTbl } = require('./lib/classes');
 require('dotenv').config();
 const cTable = require('console.table');
 
@@ -37,16 +38,19 @@ const main = async () => {
       type: 'input', name: 'dbName', message: "Choose a database (if it exists it will be overwritten!)"
     }]);
 
-    // TODO use q.dbExists to check if it already exists and then confirm with user
-
-
     // create database and "load" it
-    await db.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+    // await db.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
     await db.query(`USE ${dbName}`);
 
+    // create new employment tables from class constructors
+    var departments = new DepartmentTbl(dbName);
+    await departments.create(db);
+    await departments.seed(db);
+
     // initialize and seed tables
-    // eventually can use dbExists() function to determine if that is necessary
     await q.init(db);
+
+
   } catch (err) {
     console.log(err);
   }
@@ -114,7 +118,7 @@ const main = async () => {
           break;
         case "Add Role":
           // retrieve list of department as array
-          deptList = await q.getDeptList(db);
+          deptList = await departments.list(db);
           // from user need title, salary, dept (properties of input object)
           const { title } = await inquirer.prompt([
             { name: "title", type: "input", message: "What is the name of the role?" }
@@ -131,13 +135,14 @@ const main = async () => {
           await q.addRole(db, { title, salary, dept });
           break;
         case "View All Departments":
-          await q.viewDepts(db);
+          // await q.viewDepts(db);
+          await departments.view(db);
           break;
         case "Add Department":
           input = await inquirer.prompt([
             { name: "dept", type: "input", message: "Name of new department?" }
           ]);
-          await q.addDept(db, input);
+          await departments.add(db, input);
           break;
       } // end ELSE block
     } // end IF block
