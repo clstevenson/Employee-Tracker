@@ -1,6 +1,5 @@
 "use strict";
 
-const mysql = require('mysql2');
 
 /* Tasks for MVP
  * - View all employees: empl ID, first, last, title, dept, salary, manager
@@ -24,16 +23,18 @@ const mysql = require('mysql2');
  * of manager data.
  */
 
-const init = dbName => {
-  const db = mysql.createConnection({
-    host: process.env.DB_host,
-    user: process.env.DB_user,
-    password: process.env.DB_password,
-    database: dbName
+// check to see if the database exists (not used at present)
+const dbExists = (db, dbName) => {
+  const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
+  db.query(sql, (err, results) => {
+    if (err) console.log(err);
+    if (results[0].SCHEMA_NAME === undefined) return false;
+    else return true;
   });
+}
 
+const init = db => {
   let sql = ``;  // queries to pass to MySQL
-  let params = [];
 
   // delete the tables if they exists, needs to be in reverse order due
   // to FK constraints
@@ -267,4 +268,4 @@ WHERE
 }
 
 // export functions
-module.exports = { init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole };
+module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole };
