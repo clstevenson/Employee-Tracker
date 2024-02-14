@@ -1,29 +1,10 @@
 "use strict";
 
-// check to see if the database exists (not used at present)
-const dbExists = async (db, dbName) => {
-  const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
-  try {
-    const results = db.query(sql);
-    if (results[0].SCHEMA_NAME === undefined) return false;
-    else return true;
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
-//                         Function to initialize app                        //
+//                         Function to initialize DB                         //
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- * Takes a datababse name as input and returns a connection object initiated
- * by the mysql2 module. Use that object when calling subsequent DB queries.
- *
- * Also creates the necessary schema and seeds them, including a table view
- * of manager data.
- */
-
+// creates the necessary schema and seeds them, including a table view of managers
 const init = async db => {
   let sql = ``;  // queries to pass to MySQL
 
@@ -216,7 +197,7 @@ const addRole = async (db, roleInfo) => {
           \`name\` = '${dept}'))`;
 
     await db.query(sql);
-    console.log(`Added new job ${roleInfo.title} to the database`);
+    console.log(`Added new job ${roleInfo.title} to the ${dept} department`);
   } catch (err) {
     console.log(err);
   }
@@ -267,5 +248,33 @@ WHERE
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                            Utility DB Functions                           //
+///////////////////////////////////////////////////////////////////////////////
+
+// check to see if the database exists (not used at present)
+const dbExists = async (db, dbName) => {
+  const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
+  try {
+    const results = await db.query(sql);
+    if (results[0].SCHEMA_NAME === undefined) return false;
+    else return true;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// returns an array of current departments
+const getDeptList = async db => {
+  const sql = 'SELECT name FROM department';
+  try {
+    const [results, fields]  = await db.query(sql);
+    return results.map(item => item.name);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 // export functions
-module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole };
+module.exports = { dbExists, init, viewDepts, viewRoles, viewEmployees, addDept, addRole, addEmployee, updateRole, getDeptList };

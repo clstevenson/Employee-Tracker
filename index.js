@@ -58,7 +58,7 @@ const main = async () => {
     ]);
 
     if (answer.crud == "Quit") {
-      isFinished = true;
+      isFinished = true; // to break out of WHILE loop
     } else {
       // switch block to call correct DB function
       switch (answer.crud) {
@@ -77,8 +77,20 @@ const main = async () => {
           await q.viewRoles(db);
           break;
         case "Add Role":
-          // need to get more info from user
-          await q.addRole(db);
+          // retrieve list of department as array
+          const deptList = await q.getDeptList(db);
+          // from user need title, salary, dept (properties of input object)
+          const { title } = await inquirer.prompt([
+            { name: "title", type: "input", message: "What is the name of the role?" }
+          ]);
+          const { salary } = await inquirer.prompt([
+            { name: "salary", type: "number", message: "What is the salary of the role?" }
+          ]);
+          const { dept } = await inquirer.prompt([
+            { name: "dept", type: "list", message: "Which department does the role below to?", choices: deptList }
+          ]);
+          // now add the role to the DB
+          await q.addRole(db, { title, salary, dept });
           break;
         case "View All Departments":
           await q.viewDepts(db);
@@ -89,9 +101,9 @@ const main = async () => {
           ]);
           await q.addDept(db, input);
           break;
-      }
-    }
-  }
+      } // end ELSE block
+    } // end IF block
+  } // end WHILE loop
 
   // close MySQL connection
   db.end();
