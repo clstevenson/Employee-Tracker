@@ -61,7 +61,33 @@ const main = async () => {
       isFinished = true;
     } else {
       // switch block to call correct DB function
-      console.log(`You chose ${answer.crud}`);
+      switch (answer.crud) {
+        case "View All Employees":
+          await q.viewEmployees(db);
+          break;
+        case "Add Employee":
+          // need to get more info from user
+          await q.addEmployee(db);
+          break;
+        case "Update Employee Role":
+          // need to get more info from user
+          await q.updateRole(db);
+          break;
+        case "View All Roles":
+          await q.viewRoles(db);
+          break;
+        case "Add Role":
+          // need to get more info from user
+          await q.addRole(db);
+          break;
+        case "View All Departments":
+          await q.viewDepts(db);
+          break;
+        case "Add Department":
+          // need to get more info from user
+          await q.addDept(db);
+          break;
+      }
     }
   }
 

@@ -1,15 +1,16 @@
 "use strict";
 
-
-/* Tasks for MVP
- * - View all employees: empl ID, first, last, title, dept, salary, manager
- * - View all roles: job title, role ID, dept, salary
- * -
- * - Add employee
- * - Add role
- * - Add department
- * - Update employee role
-*/
+// check to see if the database exists (not used at present)
+const dbExists = async (db, dbName) => {
+  const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
+  try {
+    const results = db.query(sql);
+    if (results[0].SCHEMA_NAME === undefined) return false;
+    else return true;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                         Function to initialize app                        //
@@ -22,18 +23,6 @@
  * Also creates the necessary schema and seeds them, including a table view
  * of manager data.
  */
-
-// check to see if the database exists (not used at present)
-const dbExists = async (db, dbName) => {
-  const sql = `SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${dbName}'`;
-  try {
-    const results = db.query(sql);
-    if (results[0].SCHEMA_NAME === undefined) return false;
-    else return true;
-  } catch (err) {
-    console.log(err);
-  }
-}
 
 const init = async db => {
   let sql = ``;  // queries to pass to MySQL
@@ -151,7 +140,7 @@ const viewDepts = async db => {
   try {
     const sql = 'select id as \`dept_id\`, name as \`dept\` from department';
     const results = await db.query(sql);
-    console.table(results);
+    console.table(results[0]);
   } catch (err) {
     console.log(err);
   }
@@ -166,7 +155,7 @@ FROM \`role\` r
   JOIN department d ON r.department_id = d.id`;
 
     const results = await db.query(sql);
-    console.table(results);
+    console.table(results[0]);
   } catch (err) {
     console.log(err);
   }
@@ -191,7 +180,7 @@ FROM
 ORDER BY d.\`name\`, e.last_name`;
 
     const results = await db.query(sql);
-    console.table(results);
+    console.table(results[0]);
   } catch (err) {
     console.log(err);
   }
