@@ -49,7 +49,7 @@ FROM employee;
 SELECT
   r.id `job_id`, r.title as `job_title`, d.`name` as `department`, r.salary
 FROM `role` r
-  JOIN department d ON r.department_id = d.id;
+  LEFT JOIN department d ON r.department_id = d.id;
 
 
 SELECT
@@ -115,3 +115,11 @@ SET
   role_id = (SELECT id FROM `role` WHERE title = 'Paralegal')
 WHERE
   first_name = 'Chris' AND last_name = 'Stevenson';
+
+-- delete 1 row from each table;
+DELETE FROM employee where first_name="Sashi" AND last_name="Reeker";
+DELETE FROM `role` where id=3;
+DELETE FROM department where name='Legal';
+
+SELECT * from employee;
+SELECT * from `role`;

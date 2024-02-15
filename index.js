@@ -27,8 +27,11 @@ const main = async () => {
     'View All Roles',
     'View All Employees',
     'Add Department',
+    'Delete Department',
     'Add Role',
+    'Delete Role',
     'Add Employee',
+    'Delete Employee',
     'Update Employee Role',
     'Quit'
   ];
@@ -98,6 +101,17 @@ const main = async () => {
           // add the employee to the list
           await employees.add(db, answer);
           break;
+        case "Delete Employee":
+          employeeList = await employees.list(db);
+          answer = await inquirer.prompt([
+            {
+              name: "fullName", type: "list",
+              message: "Which employee do you want to delete?",
+              choices: employeeList
+            }
+          ]);
+          await employees.delete(db, answer);
+          break;
         case "Update Employee Role":
           // get a list of all employees as an array
           employeeList = await employees.list(db);
@@ -138,6 +152,19 @@ const main = async () => {
           // now add the role to the DB
           await roles.add(db, answer);
           break;
+        case "Delete Role":
+          // get list of roles
+          roleList = await roles.list(db);
+          // prompt the user for the role to delete
+          answer = await inquirer.prompt([
+            {
+              name: "title", type: "list",
+              message: "Which role do you wish to delete?",
+              choices: roleList
+            }
+          ])
+          await roles.delete(db, answer);
+          break;
         case "View All Departments":
           await departments.view(db);
           break;
@@ -147,6 +174,18 @@ const main = async () => {
           ]);
           await departments.add(db, answer);
           break;
+        case "Delete Department":
+          deptList = await departments.list(db);
+          answer = await inquirer.prompt([
+            {
+              name: "dept", type: "list",
+              message: "Which dept do you wish to delete?",
+              choices: deptList
+            }
+          ]);
+          await departments.delete(db, answer);
+          break;
+
       } // end ELSE block
     } // end IF block
   } // end WHILE loop
