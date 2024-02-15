@@ -26,15 +26,20 @@ const main = async () => {
     'View All Departments',
     'View All Roles',
     'View All Employees',
+    new inquirer.Separator(),
     'Add Department',
     'Delete Department',
     'View Department Total Salary',
+    new inquirer.Separator(),
     'Add Role',
     'Delete Role',
+    new inquirer.Separator(),
     'Add Employee',
     'Delete Employee',
     'Update Employee Role',
-    'Quit'
+    new inquirer.Separator(),
+    'Quit',
+    new inquirer.Separator(),
   ];
 
   // connect with MySQL system
