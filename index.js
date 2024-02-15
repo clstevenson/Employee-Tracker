@@ -37,10 +37,6 @@ const main = async () => {
       type: 'input', name: 'dbName', message: "Choose a database (if it exists it will be overwritten!)"
     }]);
 
-    // create database and "load" it
-    // await db.query(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
-    // await db.query(`USE ${dbName}`);
-
     // initialize and seed tables
     var departments = new DepartmentTbl(dbName);
     var roles = new RoleTbl(dbName);

@@ -58,14 +58,13 @@ SELECT
   e.last_name,
   r.title,
   r.salary,
-  CONCAT(e2.first_name, ' ', e2.last_name) as `manager`
+  CONCAT(e2.first_name, ' ', e2.last_name) AS `manager`
 FROM
   employee e
   JOIN `role` r ON e.role_id = r.id
-  JOIN employee m ON e.id = m.id
-  LEFT JOIN employee e2 ON m.manager_id = e2.id
- ORDER BY e.id
-;
+  LEFT JOIN employee e2 ON e.manager_id = e2.id
+ORDER BY
+  e.id;
 
 /************ table updates *******************/
 
