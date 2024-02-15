@@ -117,9 +117,17 @@ WHERE
   first_name = 'Chris' AND last_name = 'Stevenson';
 
 -- delete 1 row from each table;
-DELETE FROM employee where first_name="Sashi" AND last_name="Reeker";
+DELETE FROM employee where first_name="Kristian" AND last_name="Falck";
 DELETE FROM `role` where id=3;
 DELETE FROM department where name='Legal';
 
-SELECT * from employee;
-SELECT * from `role`;
+-- calculate total budget (salary) for each dept;
+SELECT
+  d.name AS `Department`,
+  SUM(salary) AS `Total Salary`
+FROM
+  employee e
+  JOIN `role` r ON e.role_id = r.id
+  JOIN department d ON r.department_id = d.id
+GROUP BY d.id
+ORDER BY d.name;

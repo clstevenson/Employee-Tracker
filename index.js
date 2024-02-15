@@ -28,6 +28,7 @@ const main = async () => {
     'View All Employees',
     'Add Department',
     'Delete Department',
+    'View Department Total Salary',
     'Add Role',
     'Delete Role',
     'Add Employee',
@@ -167,6 +168,9 @@ const main = async () => {
           break;
         case "View All Departments":
           await departments.view(db);
+          break;
+        case "View Department Total Salary":
+          await departments.budget(db);
           break;
         case "Add Department":
           answer = await inquirer.prompt([
