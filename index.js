@@ -22,7 +22,6 @@ const cTable = require('console.table');
 const main = async () => {
   let answer, isFinished = false;  // user responses
   let deptList = [], roleList = [], employeeList = []; // generated on the fly in switch block
-  let firstName, lastName, fullName, managerFullName, employeeRole, salary, dept; // switch block vars
   const options = [ // CRUD options for user
     'View All Departments',
     'View All Roles',
@@ -83,31 +82,21 @@ const main = async () => {
           employeeList = await employees.list(db);
           // collect info from user
           answer = await inquirer.prompt([
-            { name: "firstName", type: "input", message: "What is the employee's first name?" }
-          ]);
-          firstName = answer.firstName; // destructuring inquirer responses seems to cause compiler problems
-          answer = await inquirer.prompt([
-            { name: "lastName", type: "input", message: "What is the employee's last name?" }
-          ]);
-          lastName = answer.lastName;
-          answer = await inquirer.prompt([
+            { name: "firstName", type: "input", message: "What is the employee's first name?" },
+            { name: "lastName", type: "input", message: "What is the employee's last name?" },
             {
-              name: "employeeRole", type: "list",
+              name: "title", type: "list",
               message: "What is the employee's role?",
               choices: roleList
-            }
-          ]);
-          employeeRole = answer.employeeRole;
-          answer = await inquirer.prompt([
+            },
             {
               name: "managerFullName", type: "list",
               message: "Who is the employee's manager?",
               choices: employeeList
-            }
+            },
           ]);
-          managerFullName = answer.managerFullName;
           // add the employee to the list
-          await employees.add(db, { firstName, lastName, title: employeeRole, managerFullName });
+          await employees.add(db, answer);
           break;
         case "Update Employee Role":
           // get a list of all employees as an array
@@ -117,22 +106,18 @@ const main = async () => {
           // need to get the following info: fullName, title
           answer = await inquirer.prompt([
             {
-              name: "fullName", type: "list",
+              name: "name", type: "list",
               message: "Select an employee whose role you wish to update.",
               choices: employeeList
-            }
-          ]);
-          fullName = answer.fullName;
-          answer = await inquirer.prompt([
+            },
             {
-              name: "employeeRole", type: "list",
+              name: "role", type: "list",
               message: "Select the new role for the employee",
               choices: roleList
             }
           ]);
-          employeeRole = answer.employeeRole;
           // update the role in the DB
-          await roles.update(db, { name, role: employeeRole });
+          await roles.update(db, answer);
           break;
         case "View All Roles":
           await roles.view(db);
@@ -142,23 +127,16 @@ const main = async () => {
           deptList = await departments.list(db);
           // from user need title, salary, dept (properties of input object)
           answer = await inquirer.prompt([
-            { name: "employeeRole", type: "input", message: "What is the name of the role?" }
-          ]);
-          employeeRole = answer.employeeRole;
-          answer = await inquirer.prompt([
-            { name: "salary", type: "number", message: "What is the salary of the role?" }
-          ]);
-          salary = answer.salary;
-          answer = await inquirer.prompt([
+            { name: "title", type: "input", message: "What is the name of the role?" },
+            { name: "salary", type: "number", message: "What is the salary of the role?" },
             {
               name: "dept", type: "list",
               message: "Which department does the role below to?",
               choices: deptList
             }
           ]);
-          dept = answer.dept;
           // now add the role to the DB
-          await roles.add(db, { title: employeeRole, salary, dept });
+          await roles.add(db, answer);
           break;
         case "View All Departments":
           await departments.view(db);
