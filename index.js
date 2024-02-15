@@ -14,13 +14,13 @@ const main = async () => {
   let answer, input, isFinished = false;  // user responses
   var deptList = [], roleList = [], employeeList = []; // current lists from DB
   const options = [ // CRUD options for user
+    "View All Departments",
+    "View All Roles",
     "View All Employees",
+    "Add Department",
+    "Add Role",
     "Add Employee",
     "Update Employee Role",
-    "View All Roles",
-    "Add Role",
-    "View All Departments",
-    "Add Department",
     "Quit"
   ];
 

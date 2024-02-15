@@ -52,22 +52,20 @@ FROM `role` r
   JOIN department d ON r.department_id = d.id;
 
 
--- view all employees: ID, first, last, title, dept, salary, manager (or null if manager)
 SELECT
   e.id,
   e.first_name,
   e.last_name,
   r.title,
-  d. `name` AS `department`,
   r.salary,
-  m.manager
+  CONCAT(e2.first_name, ' ', e2.last_name) as `manager`
 FROM
   employee e
   JOIN `role` r ON e.role_id = r.id
-  JOIN department d ON r.department_id = d.id
-  LEFT JOIN managers m on e.manager_id = m.employee_id
-ORDER BY d.`name`, e.last_name;
-
+  JOIN employee m ON e.id = m.id
+  LEFT JOIN employee e2 ON m.manager_id = e2.id
+ ORDER BY e.id
+;
 
 /************ table updates *******************/
 
@@ -93,20 +91,19 @@ INSERT INTO `role` (title, salary, department_id)
 -- need to do two lookups here: role -> role_ID and manager -> manager_id
 -- let's say we are adding Sam Smith as a paralegal and his manager is Denny Zizka
 
-SELECT id FROM `role` WHERE title = "Paralegal"; -- returned 9
-SELECT employee_id from managers WHERE manager = 'Denny Zizka'; -- returned 7
--- if the new employee is also a manager, do I need to change manager_id to NULL?
+SELECT id FROM `role` WHERE title = "Lab Technician";
+SELECT id from employee WHERE CONCAT(first_name, ' ', last_name) = 'Insup Syang';
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-    VALUES('Sam', 'Smith', (
+    VALUES('Ian', 'Stevenson', (
         SELECT
           id FROM `role`
         WHERE
-          title = "Paralegal"), (
+          title = "Lab Technician"), (
           SELECT
-            employee_id FROM managers
+            lookup.id FROM (select * from employee) AS lookup
           WHERE
-            manager = 'Denny Zizka'));
+            CONCAT(first_name, ' ', last_name) = 'Insup Syang'));
 
 -- updating a role/job (prompted to select employee and their new role, both selected from lists of current options)
 -- need to do lookups: employee.id from name, role.id from role, and manager_id from the department_id (Using managers)
