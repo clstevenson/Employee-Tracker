@@ -43,11 +43,17 @@ const main = async () => {
   ];
 
   // connect with MySQL system
-  const db = await mysql.createConnection({
-    host: process.env.DB_host,
-    user: process.env.DB_user,
-    password: process.env.DB_password
-  });
+  try {
+    var db = await mysql.createConnection({
+      host: process.env.DB_host,
+      user: process.env.DB_user,
+      password: process.env.DB_password
+    });
+  } catch (err) {
+    console.log('Trouble connecting with MySQL server! Details below; program will exit...');
+    console.log(err);
+    return;
+  }
 
   // get database name from user and create it and the tables
   try {
@@ -67,7 +73,9 @@ const main = async () => {
     await employees.seed(db);
 
   } catch (err) {
+    console.log('Could not create/seed tables in the database! Details below; program will exit...')
     console.log(err);
+    return;
   }
 
   // prompt user for CRUD operations (or allow to quit)
