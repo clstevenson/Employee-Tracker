@@ -7,8 +7,10 @@ This is a command-line application to view and management employees. It uses nod
 
 ## Installation
 1. Clone or download this repo into a directory of your choosing.
-2. If necessary, install [Node.js](https://nodejs.org/en) and [MySQL](https://www.mysql.com) on your computer.
-3. In the terminal, navigate to the directory where you downloaded this app and type `npm install` to install the necessary dependencies.
+2. If necessary, install [Node.js](https://nodejs.org/en) and [MySQL](https://www.mysql.com) on your computer. Make sure the MySQL server is running before starting this app.
+4. In the terminal, navigate to the directory where you downloaded this app and type `touch .env` and then open the file with the text editor of your choice.
+3. In order to create a connection to the MySQL server, in the `.env` file you will need to define three environmental variables: `DB_host`, `DB_user`, and `DB_password`. For a local MySQL server on your computer, `DB_host=localhost` and `DB_user=root` would be common values; if you are connecting to a remote database, substitute the appropriate values. Don't forget to also define your password as `DB_password.`
+5. Type `npm install` to install the necessary dependencies for the app.
 
 ## Use
 To start the app, type `node index.js`. You will be prompted for a database name. If you name an existing database, be aware that it will be overwritten (there is a warning about this in the app). After you enter the database, three tables are created: department, role, and employee. The schema for these tables are in the `schema.sql` file of the db folder if you are interested. Sample data are seeded to these tables, as shown in the `seeds.sql` file; neither of these files are necessary for the operation of the app.
