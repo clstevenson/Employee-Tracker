@@ -85,126 +85,124 @@ const main = async () => {
       { name: "crud", type: "list", message: "What would you like to do?", choices: options }
     ]);
 
-    if (answer.crud == "Quit") {
-      isFinished = true; // to break out of WHILE loop
-    } else {
-      // switch block to call correct DB function
-      switch (answer.crud) {
-        case "View All Employees":
-          await employees.view(db);
-          break;
-        case "Add Employee":
-          // get the current list of employees and roles
-          roleList = await roles.list(db);
-          employeeList = await employees.list(db);
-          // collect info from user
-          answer = await inquirer.prompt([
-            { name: "firstName", type: "input", message: "What is the employee's first name?" },
-            { name: "lastName", type: "input", message: "What is the employee's last name?" },
-            {
-              name: "title", type: "list",
-              message: "What is the employee's role?",
-              choices: roleList
-            },
-            {
-              name: "managerFullName", type: "list",
-              message: "Who is the employee's manager?",
-              choices: employeeList
-            },
-          ]);
-          // add the employee to the list
-          await employees.add(db, answer);
-          break;
-        case "Delete Employee":
-          employeeList = await employees.list(db);
-          answer = await inquirer.prompt([
-            {
-              name: "fullName", type: "list",
-              message: "Which employee do you want to delete?",
-              choices: employeeList
-            }
-          ]);
-          await employees.delete(db, answer);
-          break;
-        case "Update Employee Role":
-          // get a list of all employees as an array
-          employeeList = await employees.list(db);
-          // get a list of all possible (new) roles as an array
-          roleList = await roles.list(db);
-          // need to get the following info: fullName, title
-          answer = await inquirer.prompt([
-            {
-              name: "name", type: "list",
-              message: "Select an employee whose role you wish to update.",
-              choices: employeeList
-            },
-            {
-              name: "role", type: "list",
-              message: "Select the new role for the employee",
-              choices: roleList
-            }
-          ]);
-          // update the role in the DB
-          await roles.update(db, answer);
-          break;
-        case "View All Roles":
-          await roles.view(db);
-          break;
-        case "Add Role":
-          // retrieve list of department as array
-          deptList = await departments.list(db);
-          // from user need title, salary, dept (properties of input object)
-          answer = await inquirer.prompt([
-            { name: "title", type: "input", message: "What is the name of the role?" },
-            { name: "salary", type: "number", message: "What is the salary of the role?" },
-            {
-              name: "dept", type: "list",
-              message: "Which department does the role below to?",
-              choices: deptList
-            }
-          ]);
-          // now add the role to the DB
-          await roles.add(db, answer);
-          break;
-        case "Delete Role":
-          // get list of roles
-          roleList = await roles.list(db);
-          // prompt the user for the role to delete
-          answer = await inquirer.prompt([
-            {
-              name: "title", type: "list",
-              message: "Which role do you wish to delete?",
-              choices: roleList
-            }
-          ])
-          await roles.delete(db, answer);
-          break;
-        case "View All Departments":
-          await departments.view(db);
-          break;
-        case "View Department Total Salary":
-          await departments.budget(db);
-          break;
-        case "Add Department":
-          answer = await inquirer.prompt([
-            { name: "dept", type: "input", message: "Name of new department?" }
-          ]);
-          await departments.add(db, answer);
-          break;
-        case "Delete Department":
-          deptList = await departments.list(db);
-          answer = await inquirer.prompt([
-            {
-              name: "dept", type: "list",
-              message: "Which dept do you wish to delete?",
-              choices: deptList
-            }
-          ]);
-          await departments.delete(db, answer);
-          break;
-
-      } // end ELSE block
-    } // end IF block
+    // switch block to call correct DB function (or quit the app)
+    switch (answer.crud) {
+      case "View All Employees":
+        await employees.view(db);
+        break;
+      case "Add Employee":
+        // get the current list of employees and roles
+        roleList = await roles.list(db);
+        employeeList = await employees.list(db);
+        // collect info from user
+        answer = await inquirer.prompt([
+          { name: "firstName", type: "input", message: "What is the employee's first name?" },
+          { name: "lastName", type: "input", message: "What is the employee's last name?" },
+          {
+            name: "title", type: "list",
+            message: "What is the employee's role?",
+            choices: roleList
+          },
+          {
+            name: "managerFullName", type: "list",
+            message: "Who is the employee's manager?",
+            choices: employeeList
+          },
+        ]);
+        // add the employee to the list
+        await employees.add(db, answer);
+        break;
+      case "Delete Employee":
+        employeeList = await employees.list(db);
+        answer = await inquirer.prompt([
+          {
+            name: "fullName", type: "list",
+            message: "Which employee do you want to delete?",
+            choices: employeeList
+          }
+        ]);
+        await employees.delete(db, answer);
+        break;
+      case "Update Employee Role":
+        // get a list of all employees as an array
+        employeeList = await employees.list(db);
+        // get a list of all possible (new) roles as an array
+        roleList = await roles.list(db);
+        // need to get the following info: fullName, title
+        answer = await inquirer.prompt([
+          {
+            name: "name", type: "list",
+            message: "Select an employee whose role you wish to update.",
+            choices: employeeList
+          },
+          {
+            name: "role", type: "list",
+            message: "Select the new role for the employee",
+            choices: roleList
+          }
+        ]);
+        // update the role in the DB
+        await roles.update(db, answer);
+        break;
+      case "View All Roles":
+        await roles.view(db);
+        break;
+      case "Add Role":
+        // retrieve list of department as array
+        deptList = await departments.list(db);
+        // from user need title, salary, dept (properties of input object)
+        answer = await inquirer.prompt([
+          { name: "title", type: "input", message: "What is the name of the role?" },
+          { name: "salary", type: "number", message: "What is the salary of the role?" },
+          {
+            name: "dept", type: "list",
+            message: "Which department does the role belong to?",
+            choices: deptList
+          }
+        ]);
+        // now add the role to the DB
+        await roles.add(db, answer);
+        break;
+      case "Delete Role":
+        // get list of roles
+        roleList = await roles.list(db);
+        // prompt the user for the role to delete
+        answer = await inquirer.prompt([
+          {
+            name: "title", type: "list",
+            message: "Which role do you wish to delete?",
+            choices: roleList
+          }
+        ])
+        await roles.delete(db, answer);
+        break;
+      case "View All Departments":
+        await departments.view(db);
+        break;
+      case "View Department Total Salary":
+        await departments.budget(db);
+        break;
+      case "Add Department":
+        answer = await inquirer.prompt([
+          { name: "dept", type: "input", message: "Name of new department?" }
+        ]);
+        await departments.add(db, answer);
+        break;
+      case "Delete Department":
+        deptList = await departments.list(db);
+        answer = await inquirer.prompt([
+          {
+            name: "dept", type: "list",
+            message: "Which dept do you wish to delete?",
+            choices: deptList
+          }
+        ]);
+        await departments.delete(db, answer);
+        break;
+      case "Quit":
+        isFinished = true;
+        break;
+    } // end SWITCH block
   } // end WHILE loop
 
   // close MySQL connection
